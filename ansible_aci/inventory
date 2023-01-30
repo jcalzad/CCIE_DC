@@ -1,6 +1,8 @@
 [apic:vars]
 ansible_user=<un>
 ansible_password=<pw>
+
+#This should be the path to interpretor - look in your venv folder!
 ansible_python_interpreter="/usr/bin/env python"
 
 

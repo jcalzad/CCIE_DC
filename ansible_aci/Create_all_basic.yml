@@ -1,0 +1,99 @@
+---
+- name: ENSURE APPLICATION CONFIGURATION EXISTS
+  hosts: apic
+  connection: local
+  gather_facts: False
+  vars_prompt:
+    - name: "tenant"
+      prompt: "What would you like to name your Tenant?"
+      private: no
+    - name: "vrf"
+      prompt: "What VRF should we create for this tenant?"
+      private: no
+    - name: "bd"
+      prompt: "What BD should should we create for this VRF?"
+      private: no
+    - name: "ip"
+      prompt: "What IP for the Gateway?"
+      private: no
+    - name: "mask"
+      prompt: "What mask should we use?"
+      private: no
+    - name: "ap"
+      prompt: "What is the AP name?"
+      private: no
+    - name: "epg"
+      prompt: "What EPG do we associate to the AP and BD?"
+      private: no
+
+  tasks:
+    - name: ENSURE APPLICATIONS TENANT EXISTS
+      aci_tenant:
+        host: "{{ ansible_host }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        state: "present"
+        validate_certs: False
+        tenant: "{{ tenant }}"
+        description: "Tenant Created Using Ansible"
+    
+    - name: Add a new VRF to a tenant
+      cisco.aci.aci_vrf:
+        host: "{{ ansible_host }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        vrf: "{{ vrf }}"
+        tenant: "{{ tenant }}"
+        state: "present"
+        validate_certs: False
+
+    - name: Add Bridge Domain
+      cisco.aci.aci_bd:
+        host: "{{ ansible_host }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        state: "present"
+        validate_certs: False
+        vrf: "{{ vrf }}"
+        tenant: "{{ tenant }}"
+        bd: "{{ bd }}"
+
+    - name: Create a subnet
+      cisco.aci.aci_bd_subnet:
+        host: "{{ ansible_host }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        state: "present"
+        validate_certs: False
+        tenant: "{{ tenant }}"
+        bd: "{{ bd }}"
+        gateway: "{{ ip }}"
+        mask: "{{ mask }}"
+
+    - name: Add a new AP
+      cisco.aci.aci_ap:
+        host: "{{ ansible_host }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        state: "present"
+        validate_certs: False
+        tenant: "{{ tenant }}"
+        ap: "{{ ap }}"
+        description: default ap
+
+    - name: Add a new EPG
+      cisco.aci.aci_epg:
+        host: "{{ ansible_host }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        state: "present"
+        validate_certs: False
+        tenant: "{{ tenant }}"
+        ap: "{{ ap }}"
+        epg: "{{ epg }}"
+        bd: "{{ bd }}"
+
+
+
+
+

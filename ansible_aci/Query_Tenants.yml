@@ -1,0 +1,18 @@
+- name: ENSURE APPLICATION CONFIGURATION EXISTS
+  hosts: apic
+  connection: local
+  gather_facts: False
+
+  tasks:
+    - name: LIST TENANTS
+      aci_tenant:
+        host: "{{ ansible_host }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        state: "query"
+        validate_certs: False
+      register: query_result
+
+    - name: PRINT TENANT LISTS
+      debug:
+        msg: "{{ query_result | json_query('current[].fvTenant.attributes.name') }}"
